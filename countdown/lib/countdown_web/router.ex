@@ -1,6 +1,16 @@
 defmodule CountdownWeb.Router do
   use CountdownWeb, :router
 
+  require Ueberauth
+
+  scope "/auth", CountdownWeb do
+    pipe_through :browser
+
+      get "/:provider", AuthController, :request
+      get "/:provider/callback", AuthController, :callback
+      post "/:provider/callback", AuthController, :callback
+    end
+
   pipeline :browser do
     plug :accepts, ["html"]
     plug :fetch_session
@@ -17,7 +27,9 @@ defmodule CountdownWeb.Router do
     pipe_through :browser # Use the default browser stack
 
     get "/", PageController, :index
+    get "/logout", AuthController, :logout
     resources "/events", EventController
+    
   end
 
   # Other scopes may use custom stacks.
